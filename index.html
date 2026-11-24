@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>PLC Link Builder</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #F7F7F5; --panel: #FFFFFF; --fg: #0F0F12; --muted: #5E5E66; --line: #DDDAD2;
+  --gold: #8F7C44; --gold-soft: #EFE9D8; --ok: #2F6B45;
+  --display: "Libre Baskerville", Georgia, "Times New Roman", serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root {
+  --bg: #0F0F12; --panel: #18181C; --fg: #F7F7F5; --muted: #A3A3AB; --line: #2A2A2E;
+  --gold: #B7A26A; --gold-soft: #2A261C; --ok: #7FBF95; color-scheme: dark } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.wrap { max-width: 760px; margin-inline: auto; padding: 40px 16px 64px; display: grid; gap: 28px; }
+.eyebrow { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(26px, 5vw, 34px); line-height: 1.2; margin: 6px 0 8px; text-wrap: balance; }
+h2 { font-family: var(--display); font-weight: 400; font-size: 19px; margin: 0 0 12px; }
+.lede { color: var(--muted); max-width: 62ch; margin: 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 24px; display: grid; gap: 18px; min-width: 0; }
+.row { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); }
+label { display: grid; gap: 6px; font-size: 13px; font-weight: 500; }
+label .hint { font-weight: 400; color: var(--muted); font-size: 12px; }
+input, select { font: inherit; font-size: 16px; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 9px 11px; width: 100%; }
+input:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.pair { display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.chip { font-family: var(--mono); font-size: 12px; background: var(--gold-soft); color: var(--fg); padding: 2px 8px; border-radius: 3px; }
+.out { border-top: 1px solid var(--line); padding-top: 18px; display: grid; gap: 10px; min-width: 0; }
+.link { font-family: var(--mono); font-size: 13px; word-break: break-all; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 12px; user-select: all; }
+.actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+button { font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; border-radius: 4px; padding: 11px 16px; border: 1px solid var(--fg); background: var(--fg); color: var(--bg); }
+button.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.status { font-size: 13px; color: var(--ok); min-height: 1.2em; }
+.warn { font-size: 13px; color: var(--gold); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 500; color: var(--muted); font-size: 12px; }
+td code { font-family: var(--mono); font-size: 12px; }
+.scroll { overflow-x: auto; }
+ul.rules { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.recent { display: grid; gap: 8px; }
+.recent div { font-family: var(--mono); font-size: 12px; color: var(--muted); word-break: break-all; }
+.foot { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Private Luxury Collection · Tracking</div>
+    <h1>Tag every link before it leaves the office</h1>
+    <p class="lede">Choose your name, where the link will be posted or sent, and paste the page address. Copy the tagged link it gives you. Google Analytics will then show which advisor, channel and group each visitor and enquiry came from.</p>
+  </header>
+
+  <section class="card" aria-labelledby="b-h">
+    <h2 id="b-h">Build a link</h2>
+    <label for="dest">Page address
+      <input id="dest" type="url" value="https://www.privateluxurycollection.com/" autocomplete="off">
+      <span class="hint">The exact page you want people to land on, such as a property, the Black Book or the consultation page.</span>
+    </label>
+    <div class="row">
+      <label for="advisor">Who is posting?
+        <select id="advisor"></select>
+        <span class="hint">Pick your name once. This device remembers it.</span>
+      </label>
+      <label for="place">Group or thread name <span class="hint">(when posting into one)</span>
+        <input id="place" placeholder="e.g. Algarve Expats Facebook group" autocomplete="off">
+        <span class="hint">Type it as you'd say it. It's formatted for you.</span>
+      </label>
+    </div>
+    <div class="row">
+      <label for="preset">Where will this link go?
+        <select id="preset"></select>
+      </label>
+      <label for="campaign">Campaign
+        <input id="campaign" value="brief-2026-11" autocomplete="off">
+        <span class="hint">What it's about: a property ref, Brief issue or campaign name.</span>
+      </label>
+    </div>
+    <div class="row">
+      <label for="source">Source <span class="hint">Filled from your choice. Change it for a named partner.</span>
+        <input id="source" autocomplete="off">
+      </label>
+      <label for="content">Detail (optional)
+        <input id="content" placeholder="e.g. hero-image, footer-link" autocomplete="off">
+        <span class="hint">Use when one email or post has more than one link.</span>
+      </label>
+    </div>
+    <div class="pair">Medium: <span class="chip" id="medium-chip">—</span> Advisor: <span class="chip" id="advisor-chip">—</span> Group/thread: <span class="chip" id="place-chip">—</span></div>
+
+    <div class="out">
+      <div class="link" id="out" aria-live="polite">—</div>
+      <div class="warn" id="warn"></div>
+      <div class="actions">
+        <button id="copy" type="button">Copy link</button>
+        <button id="reset" type="button" class="ghost">Clear</button>
+        <span class="status" id="status"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="r-h">
+    <h2 id="r-h">House rules</h2>
+    <ul class="rules">
+      <li>Everything is lowercase with hyphens, never spaces: <code>brief-2026-11</code>, not <code>Brief Nov 2026</code>.</li>
+      <li>Only ever tag links pointing to our own sites. Never tag internal links between pages on the website, because that restarts the visit and hides its real source.</li>
+      <li>Casafari smartlinks (smartlink.casafaricrm.com) can't be tagged and don't show in Google Analytics. Read who opened them in Casafari. When you send a link to the property page on <em>our website</em> instead, tag it, with the property reference as the campaign: <code>pl-1158</code>.</li>
+      <li>Each partner gets a fixed source name, used every time: <code>henley</code>, <code>prestige-radiance</code>, <code>biz-capital</code>.</li>
+      <li>Advisors: always choose your name before copying a link you post or send yourself.</li>
+      <li>Posting into a Facebook group, LinkedIn group or forum thread? Type the group or thread name every time, spelled the same way each time, so the results add up in one place.</li>
+      <li>To see results in Google Analytics, open Explore and add <code>Session manual ad content</code> (shows the advisor) and <code>Session manual term</code> (shows the group or thread).</li>
+      <li>When an enquiry arrives, record the same source in the Casafari lead-source field.</li>
+    </ul>
+  </section>
+
+  <section class="card" aria-labelledby="t-h">
+    <h2 id="t-h">The approved list</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Use for</th><th>Source</th><th>Medium</th><th>Who</th></tr></thead>
+        <tbody id="tbl"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-h">
+    <h2 id="h-h">Your recent links</h2>
+    <div class="recent" id="recent"><div>Links you copy appear here, on this device only.</div></div>
+  </section>
+
+  <p class="foot">Links are tagged for Google Analytics 4 (G-7DCVW0VGLF). Questions about the naming go to Joana.</p>
+</div>
+
+<script>
+(function () {
+  const PRESETS = [
+    { id: 'brief', label: 'Intelligence Brief (Mailchimp)', source: 'mailchimp', medium: 'email', who: 'Joana' },
+    { id: 'email-1to1', label: 'Personal email from an advisor', source: 'advisor-email', medium: 'email', who: 'Advisors' },
+    { id: 'casafari', label: 'Property page link sent from Casafari (our website, not a smartlink)', source: 'casafari', medium: 'crm-share', who: 'Advisors' },
+    { id: 'whatsapp', label: 'WhatsApp message', source: 'whatsapp', medium: 'messaging', who: 'Everyone' },
+    { id: 'linkedin-post', label: 'LinkedIn post (company or showcase page)', source: 'linkedin', medium: 'social', who: 'Marketing' },
+    { id: 'linkedin-dm', label: 'LinkedIn outreach message', source: 'linkedin', medium: 'outreach', who: 'Laarni' },
+    { id: 'linkedin-profile', label: 'LinkedIn profile / featured link', source: 'linkedin', medium: 'profile', who: 'Keely' },
+    { id: 'facebook', label: 'Facebook post', source: 'facebook', medium: 'social', who: 'Marketing' },
+    { id: 'facebook-group', label: 'Facebook group post', source: 'facebook', medium: 'social-group', who: 'Advisors', place: true },
+    { id: 'linkedin-group', label: 'LinkedIn group post', source: 'linkedin', medium: 'social-group', who: 'Advisors', place: true },
+    { id: 'forum', label: 'Online forum or thread (Reddit, expat forums)', source: 'forum-name', medium: 'forum', who: 'Advisors', place: true },
+    { id: 'instagram', label: 'Instagram bio or story', source: 'instagram', medium: 'social', who: 'Marketing' },
+    { id: 'partner', label: 'Referral partner introduction', source: 'partner-name', medium: 'referral', who: 'Keely / Piers' },
+    { id: 'podcast', label: 'Podcast show notes', source: 'podcast', medium: 'audio', who: 'Marketing' },
+    { id: 'pr', label: 'Press article or guest piece', source: 'publication-name', medium: 'pr', who: 'PR consultant' },
+    { id: 'meta-ads', label: 'Meta ad (Facebook / Instagram)', source: 'facebook', medium: 'paid-social', who: 'Paid media' },
+    { id: 'google-ads', label: 'Google Search ad', source: 'google', medium: 'cpc', who: 'Paid media' },
+    { id: 'print', label: 'Print / QR code (brochure, signage)', source: 'print', medium: 'qr', who: 'Marketing' }
+  ];
+  const ADVISORS = ['Joana', 'Natanya', 'Alexandra', 'Piers', 'Keely'];
+  const $ = (id) => document.getElementById(id);
+  const slug = (s) => s.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  const sel = $('preset'), tbl = $('tbl');
+  PRESETS.forEach((p) => {
+    const o = document.createElement('option'); o.value = p.id; o.textContent = p.label; sel.append(o);
+    const tr = document.createElement('tr');
+    [p.label, p.source, p.medium, p.who].forEach((v, i) => { const td = document.createElement('td'); if (i === 1 || i === 2) { const c = document.createElement('code'); c.textContent = v; td.append(c); } else td.textContent = v; tr.append(td); });
+    tbl.append(tr);
+  });
+  sel.value = 'brief';
+
+  const adv = $('advisor');
+  [['', 'Choose your name…']].concat(ADVISORS.map((n) => [n.toLowerCase(), n])).forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; adv.append(o); });
+  const fromHash = (location.hash || '').slice(1).toLowerCase();
+  let savedAdv = ''; try { savedAdv = localStorage.getItem('plc-utm-advisor') || ''; } catch (e) {}
+  adv.value = ADVISORS.some((n) => n.toLowerCase() === fromHash) ? fromHash : (ADVISORS.some((n) => n.toLowerCase() === savedAdv) ? savedAdv : '');
+  adv.addEventListener('change', () => { try { localStorage.setItem('plc-utm-advisor', adv.value); } catch (e) {} build(); });
+
+  const current = () => PRESETS.find((p) => p.id === sel.value);
+  function applyPreset() { $('source').value = current().source; build(); }
+
+  function build() {
+    const p = current();
+    $('medium-chip').textContent = p.medium;
+    const warn = [];
+    let url;
+    try { url = new URL($('dest').value.trim()); } catch (e) { $('out').textContent = 'Paste a full page address starting with https://'; $('warn').textContent = ''; return ''; }
+    const src = slug($('source').value), camp = slug($('campaign').value), detail = slug($('content').value);
+    const who = adv.value, place = slug($('place').value);
+    const cont = [who, detail].filter(Boolean).join('_');
+    $('advisor-chip').textContent = who || '—';
+    $('place-chip').textContent = place || '—';
+    if (!who && p.who === 'Advisors') warn.push('Choose your name so we can see this link was yours.');
+    if (p.place && !place) warn.push('Add the group or thread name so we can see which one brings results.');
+    if (p.id === 'forum' && (src === 'forum-name' || !src)) warn.push('Replace “forum-name” with the site, e.g. reddit or expat-forum.');
+    if (!/privateluxurycollection\.com|keelycapel\.com|portugalpropertyinsider\.com|github\.io$/.test(url.hostname)) warn.push('This isn’t one of our sites. Only tag links to our own pages.');
+    if (p.id === 'partner' && (src === 'partner-name' || !src)) warn.push('Replace “partner-name” with the partner’s fixed name, e.g. henley.');
+    if (p.id === 'pr' && (src === 'publication-name' || !src)) warn.push('Replace “publication-name” with the title, e.g. ft-htsi.');
+    if (!camp) warn.push('Add a campaign so we know what this link was for.');
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach((k) => url.searchParams.delete(k));
+    if (src) url.searchParams.set('utm_source', src);
+    url.searchParams.set('utm_medium', p.medium);
+    if (camp) url.searchParams.set('utm_campaign', camp);
+    if (cont) url.searchParams.set('utm_content', cont);
+    if (place) url.searchParams.set('utm_term', place);
+    const s = url.toString();
+    $('out').textContent = s;
+    $('warn').textContent = warn.join(' ');
+    return s;
+  }
+
+  function loadRecent() { try { return JSON.parse(localStorage.getItem('plc-utm-recent') || '[]'); } catch (e) { return []; } }
+  function saveRecent(s) {
+    const list = [s].concat(loadRecent().filter((x) => x !== s)).slice(0, 8);
+    try { localStorage.setItem('plc-utm-recent', JSON.stringify(list)); } catch (e) {}
+    renderRecent(list);
+  }
+  function renderRecent(list) {
+    const box = $('recent'); box.replaceChildren();
+    if (!list.length) { const d = document.createElement('div'); d.textContent = 'Links you copy appear here, on this device only.'; box.append(d); return; }
+    list.forEach((s) => { const d = document.createElement('div'); d.textContent = s; box.append(d); });
+  }
+
+  $('copy').addEventListener('click', () => {
+    const s = build(); if (!s) return;
+    const done = () => { $('status').textContent = 'Copied'; saveRecent(s); setTimeout(() => { $('status').textContent = ''; }, 2000); };
+    const fallback = () => { const r = document.createRange(); r.selectNodeContents($('out')); const w = getSelection(); w.removeAllRanges(); w.addRange(r); $('status').textContent = 'Selected. Press Ctrl/Cmd + C to copy.'; saveRecent(s); };
+    try { navigator.clipboard.writeText(s).then(done, fallback); } catch (e) { fallback(); }
+  });
+  $('reset').addEventListener('click', () => { $('campaign').value = ''; $('content').value = ''; $('place').value = ''; applyPreset(); });
+  sel.addEventListener('change', applyPreset);
+  ['dest', 'source', 'campaign', 'content', 'place'].forEach((id) => $(id).addEventListener('input', build));
+
+  applyPreset();
+  renderRecent(loadRecent());
+})();
+</script>
+</body>
+</html>
